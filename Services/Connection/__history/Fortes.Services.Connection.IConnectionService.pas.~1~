@@ -1,0 +1,12 @@
+unit Fortes.Services.Connection.IConnectionService;
+
+interface
+
+tyoe
+ IConnectionService = interface
+
+ end;
+
+implementation
+
+end.

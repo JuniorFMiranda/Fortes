@@ -1,0 +1,62 @@
+unit Fortes.Services.ConnectionIConnectionService;
+
+interface
+
+uses
+  System.Classes,
+  Firedac.Comp.Client,
+  Fortes.Services.Connection.IConnectionService;
+
+type
+ ConnectionService = class(TInterfacedObject, IConnectionService)
+ private
+   FLocalConnection: TFDConnection;
+
+ protected
+   procedure MakeLocal;
+   procedure UndoLocal;
+
+   function GetConnection: TFDConnection;
+ public
+   constructor Create;
+   destructor Destroy; override;
+   Class function New: IConnectionService;
+
+ end;
+
+implementation
+
+{ ConnectionService }
+
+constructor ConnectionService.Create;
+begin
+  MakeLocal;
+end;
+
+destructor ConnectionService.Destroy;
+begin
+  UndoLocal;
+  inherited;
+end;
+
+function ConnectionService.GetConnection: TFDConnection;
+begin
+  Result :=  FLocalConnection;
+end;
+
+procedure ConnectionService.MakeLocal;
+begin
+  FLocalConnection := TFDConnection.Create(Nil);
+end;
+
+class function ConnectionService.New: IConnectionService;
+begin
+  Result := Self.Create;
+end;
+
+procedure ConnectionService.UndoLocal;
+begin
+  FLocalConnection.Free;
+end;
+
+end.

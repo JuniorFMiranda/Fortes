@@ -1,0 +1,29 @@
+unit Fortes.Kernel.Databaseconst;
+
+interface
+
+type
+  Combustivel = Record
+  public const
+    TABLE_NAME = 'COMBUSTIVEL';
+    FIELD_ID_COMBUSTIVEL = 'ID_COMBUSTIVEL';
+    FIELD_DESCRICAO = 'DESCRICAO';
+    FIELD_VALOR = 'VALOR';
+    FIELD_PERCENTUAL_ICMS = 'PERCENTUAL_ICMS';
+  end;
+
+  AbastecimentoItem = Record
+  public const
+    TABLE_NAME = 'ABASTECIMENTO_ITEM';
+    FIELD_ID_ABASTECIMENTO_ITEM = 'ID_ABASTECIMENTO_ITEM';
+    FIELD_ID_ABASTECIMENTO = 'ID_ABASTECIMENTO';
+    FIELD_ID_COMBUSTIVEL   = 'FIELD_ID_COMBUSTIVEL';
+    FIELD_QUANTIDADE = 'QUANTIDADE';
+    FIELD_VALOR_ICMS = 'VALOR_ICMS';
+    FIELD_VALOR = 'VALOR';
+    FIELD_TOTAL = 'TOTAL';
+  end;
+
+implementation
+
+end.

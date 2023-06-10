@@ -1,0 +1,21 @@
+unit Fortes.Services.Kernel.ICrudService;
+
+interface
+
+uses
+  Vcl.Controls, Data.Db, System.Generics.Collections,
+  Fortes.View.Base.BaseCrud;
+
+type
+  ICrudService = interface
+    ['{38CA145D-0F51-4B2D-B1EA-9C2D3D909AD2}']
+    function GetDataSet: TDataSet;
+    function GetTableName: string;
+    function InsertRecord(out ARecordId: Variant): Boolean; overload;
+    function InsertRecord(ARecordValues: TDictionary<string, Variant>;
+      AutoCommit: Boolean = True): Boolean; overload;
+  end;
+
+implementation
+
+end.

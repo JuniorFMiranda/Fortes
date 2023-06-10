@@ -1,0 +1,117 @@
+inherited AbastecimentoItemForm: TAbastecimentoItemForm
+  Caption = 'AbastecimentoItemForm'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited tbDefault: TFDQuery
+    SQL.Strings = (
+      'SELECT *  FROM ABASTECIMENTO_ITEM')
+    object tbDefaultID_ABASTECIMENTO_ITEM: TIntegerField
+      FieldName = 'ID_ABASTECIMENTO_ITEM'
+      Origin = 'ID_ABASTECIMENTO_ITEM'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object tbDefaultID_ABASTECIMENTO: TIntegerField
+      FieldName = 'ID_ABASTECIMENTO'
+      Origin = 'ID_ABASTECIMENTO'
+      Required = True
+    end
+    object tbDefaultID_COMBUSTIVEL: TIntegerField
+      FieldName = 'ID_COMBUSTIVEL'
+      Origin = 'ID_COMBUSTIVEL'
+      Required = True
+    end
+    object tbDefaultQUANTIDADE: TBCDField
+      FieldName = 'QUANTIDADE'
+      Origin = 'QUANTIDADE'
+      Required = True
+      Precision = 18
+      Size = 2
+    end
+    object tbDefaultVALOR_ICMS: TBCDField
+      FieldName = 'VALOR_ICMS'
+      Origin = 'VALOR_ICMS'
+      Required = True
+      Precision = 18
+      Size = 2
+    end
+    object tbDefaultVALOR: TBCDField
+      DisplayLabel = 'Pre'#231'o'
+      FieldName = 'VALOR'
+      Origin = 'VALOR'
+      Required = True
+      currency = True
+      Precision = 18
+      Size = 2
+    end
+    object tbDefaultTOTAL: TBCDField
+      FieldName = 'TOTAL'
+      Origin = 'TOTAL'
+      Precision = 18
+      Size = 2
+    end
+    object tbDefaultDESCRICAO: TStringField
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      Required = True
+      Size = 60
+    end
+    object tbDefaultPERCENTUAL_ICMS: TBCDField
+      FieldName = 'PERCENTUAL_ICMS'
+      Origin = 'PERCENTUAL_ICMS'
+      Required = True
+      Precision = 18
+      Size = 2
+    end
+  end
+  inherited cdsDefault: TClientDataSet
+    object cdsDefaultID_ABASTECIMENTO_ITEM: TIntegerField
+      FieldName = 'ID_ABASTECIMENTO_ITEM'
+      Required = True
+    end
+    object cdsDefaultID_ABASTECIMENTO: TIntegerField
+      FieldName = 'ID_ABASTECIMENTO'
+      Required = True
+    end
+    object cdsDefaultID_COMBUSTIVEL: TIntegerField
+      FieldName = 'ID_COMBUSTIVEL'
+      Required = True
+    end
+    object cdsDefaultQUANTIDADE: TBCDField
+      FieldName = 'QUANTIDADE'
+      Required = True
+      Precision = 18
+      Size = 2
+    end
+    object cdsDefaultVALOR_ICMS: TBCDField
+      FieldName = 'VALOR_ICMS'
+      Required = True
+      Precision = 18
+      Size = 2
+    end
+    object cdsDefaultVALOR: TBCDField
+      DisplayLabel = 'Pre'#231'o'
+      FieldName = 'VALOR'
+      Required = True
+      currency = True
+      Precision = 18
+      Size = 2
+    end
+    object cdsDefaultTOTAL: TBCDField
+      FieldName = 'TOTAL'
+      Precision = 18
+      Size = 2
+    end
+    object cdsDefaultDESCRICAO: TStringField
+      FieldName = 'DESCRICAO'
+      Required = True
+      Size = 60
+    end
+    object cdsDefaultPERCENTUAL_ICMS: TBCDField
+      FieldName = 'PERCENTUAL_ICMS'
+      Required = True
+      Precision = 18
+      Size = 2
+    end
+  end
+end

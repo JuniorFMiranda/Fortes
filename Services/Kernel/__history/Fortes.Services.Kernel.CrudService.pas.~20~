@@ -1,0 +1,88 @@
+unit Fortes.Services.Kernel.CrudService;
+
+interface
+
+uses
+  Vcl.Controls, Data.Db, Vcl.Forms,  System.Generics.Collections,
+  Fortes.Services.Kernel.IFormService, Fortes.Services.Kernel.FormService,
+  Fortes.Services.Kernel.ICrudService, Fortes.View.Base.BaseCrud;
+
+type
+  TCrudService<TCrud: TBaseCrudForm> = class(TInterfacedObject, ICrudService)
+  private
+    FFormService: IFormService<TCrud>;
+  public
+    constructor Create;
+    function GetDataSet: TDataSet;
+    function GetTableName: string;
+    function GetIsMaster: Boolean;
+    function InsertRecord(ARecordValues: TDictionary<string, Variant>): Boolean; overload;
+    function ShowModal: Boolean;
+    function GetForm: TBaseCrudForm;
+    class function New: ICrudService;
+    procedure NewRecord;
+    function DetailList: TList<TBaseCrudForm>;
+    procedure SetMasterCrud(const Value: TBaseCrudForm);
+  end;
+
+implementation
+
+{ TCrudService<TCrud> }
+
+constructor TCrudService<TCrud>.Create;
+begin
+  FFormService := TFormService<TCrud>.New;
+end;
+
+function TCrudService<TCrud>.DetailList: TList<TBaseCrudForm>;
+begin
+  Result := FFormService.GetForm.DetailList;
+end;
+
+function TCrudService<TCrud>.GetDataSet: TDataSet;
+begin
+  Result := FFormService.GetForm.GetDataSet;
+end;
+
+function TCrudService<TCrud>.GetForm: TBaseCrudForm;
+begin
+  Result := FFormService.GetForm;
+end;
+
+function TCrudService<TCrud>.GetIsMaster: Boolean;
+begin
+  Result := FFormService.GetForm.GetIsMaster;
+end;
+
+function TCrudService<TCrud>.GetTableName: string;
+begin
+  Result := FFormService.GetForm.GetTableName;
+end;
+
+function TCrudService<TCrud>.InsertRecord(
+  ARecordValues: TDictionary<string, Variant>): Boolean;
+begin
+  Result := FFormService.GetForm.InsertRecord(ARecordValues);
+end;
+
+procedure TCrudService<TCrud>.NewRecord;
+begin
+  FFormService.GetForm.NewRecord;
+end;
+
+class function TCrudService<TCrud>.New: ICrudService;
+begin
+  Result := Self.Create;
+end;
+
+procedure TCrudService<TCrud>.SetMasterCrud(const Value: TBaseCrudForm);
+begin
+  FFormService.GetForm.Se
+end;
+
+function TCrudService<TCrud>.ShowModal: Boolean;
+begin
+  Result := FFormService.ShowModal;
+end;
+
+end.

@@ -1,0 +1,7 @@
+unit Fortes.Validations.IHandleExceptionServcice;
+
+interface
+
+implementation
+
+end.

@@ -1,0 +1,54 @@
+unit Fortes.View.Main;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Fortes.Services.Connection.ConnectionService,
+  Vcl.StdCtrls, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
+  FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool,
+  FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.FB, FireDAC.Phys.FBDef,
+  FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, Vcl.Menus,
+  Fortes.View.Abastecimento, Fortes.Services.Kernel.ICrudService,
+  Fortes.Services.Kernel.CrudService;
+
+
+type
+  TMainForm = class(TForm)
+    Menu: TMainMenu;
+    Movimentos1: TMenuItem;
+    Abastecimento1: TMenuItem;
+    Relatrios1: TMenuItem;
+    Abastecimento2: TMenuItem;
+    procedure Abastecimento1Click(Sender: TObject);
+  private
+    { Private declarations }
+    FCrud: ICrudService;
+  protected
+
+  public
+    { Public declarations }
+    constructor Create; override;
+  end;
+
+var
+  MainForm: TMainForm;
+
+implementation
+
+{$R *.dfm}
+
+procedure TMainForm.Abastecimento1Click(Sender: TObject);
+
+begin
+  FCrud.New;
+  FCrud.ShowModal;
+end;
+
+constructor TMainForm.Create;
+begin
+  inherited;
+  FCrud := TCrudService<TAbastecimentoForm>.New;
+end;
+
+end.

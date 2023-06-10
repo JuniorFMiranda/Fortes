@@ -1,0 +1,16 @@
+unit Fortes.Services.Kernel.IFormService;
+
+interface
+
+uses
+  Vcl.Controls, Vcl.Forms;
+
+type
+  IFormService<T: TForm> = interface
+    ['{EB0F436A-33AE-42E3-A3FE-31D0494A5564}']
+    function GetForm: T;
+  end;
+
+implementation
+
+end.

@@ -1,0 +1,166 @@
+object BaseFindForm: TBaseFindForm
+  Left = 0
+  Top = 0
+  Caption = 'BaseFindForm'
+  ClientHeight = 370
+  ClientWidth = 613
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
+  PixelsPerInch = 96
+  TextHeight = 13
+  object lblPesquisa: TLabel
+    Left = 41
+    Top = 32
+    Width = 92
+    Height = 29
+    Caption = 'Pesquisa'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -24
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object pnlFooter: TPanel
+    Left = 0
+    Top = 328
+    Width = 613
+    Height = 42
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 0
+    object btnOk: TButton
+      Left = 538
+      Top = 0
+      Width = 75
+      Height = 42
+      Align = alRight
+      Caption = 'OK'
+      Constraints.MaxWidth = 75
+      Constraints.MinWidth = 75
+      TabOrder = 0
+      OnClick = btnOkClick
+    end
+  end
+  object edtPesquisa: TEdit
+    Left = 141
+    Top = 33
+    Width = 425
+    Height = 29
+    AutoSize = False
+    BevelInner = bvNone
+    BevelOuter = bvNone
+    BorderStyle = bsNone
+    Constraints.MaxHeight = 29
+    Constraints.MinHeight = 29
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -17
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 1
+    Text = 'edtPesquisa'
+  end
+  object dbgPesquisa: TDBGrid
+    Left = 41
+    Top = 116
+    Width = 525
+    Height = 193
+    DataSource = dsFind
+    FixedColor = clWhite
+    Options = [dgTitles, dgIndicator, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+    TabOrder = 2
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -11
+    TitleFont.Name = 'Tahoma'
+    TitleFont.Style = []
+    OnDblClick = dbgPesquisaDblClick
+  end
+  object pnlSummary: TPanel
+    Left = 41
+    Top = 74
+    Width = 525
+    Height = 40
+    BevelOuter = bvNone
+    Padding.Top = 5
+    Padding.Bottom = 5
+    ParentColor = True
+    TabOrder = 3
+    object lblRecordCount: TLabel
+      Left = 166
+      Top = 5
+      Width = 33
+      Height = 30
+      Align = alLeft
+      Alignment = taCenter
+      Caption = '250'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+      ExplicitHeight = 21
+    end
+    object lblRecordCaption: TLabel
+      Left = 199
+      Top = 5
+      Width = 80
+      Height = 30
+      Align = alLeft
+      Alignment = taCenter
+      AutoSize = False
+      Caption = 'Registros'
+      Constraints.MaxWidth = 80
+      Constraints.MinWidth = 80
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      ExplicitLeft = 201
+    end
+    object lblResults: TLabel
+      Left = 0
+      Top = 5
+      Width = 166
+      Height = 30
+      Align = alLeft
+      AutoSize = False
+      Caption = 'Sua pesquisa retornou'
+      Constraints.MaxWidth = 166
+      Constraints.MinWidth = 166
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+    end
+  end
+  object qryFind: TFDQuery
+    Left = 352
+    Top = 72
+  end
+  object dsFind: TDataSource
+    DataSet = qryFind
+    Left = 416
+    Top = 73
+  end
+  object tmDelayFind: TTimer
+    OnTimer = tmDelayFindTimer
+    Left = 472
+    Top = 74
+  end
+end

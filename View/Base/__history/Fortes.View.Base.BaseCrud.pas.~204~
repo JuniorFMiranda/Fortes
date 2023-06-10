@@ -1,0 +1,444 @@
+unit Fortes.View.Base.BaseCrud;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Fortes.Services.Connection.IConnectionService,
+  Fortes.Services.Connection.ConnectionService, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  Datasnap.DBClient, Datasnap.Provider, Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, System.Generics.Collections, Vcl.StdCtrls, Vcl.ExtCtrls;
+
+type
+  TBaseCrudForm = class(TForm)
+    tbDefault: TFDQuery;
+    dsDefault: TDataSource;
+    dspDefault: TDataSetProvider;
+    cdsDefault: TClientDataSet;
+    pnlFooter: TPanel;
+    btnSalvar: TButton;
+    procedure btnSalvarClick(Sender: TObject);
+  private
+    { Private declarations }
+    FConnection: IConnectionService;
+    FMasterCrud: TBaseCrudForm;
+    FDetailFieldName: string;
+    FRecordId: Variant;
+    FDetailList: TList<TBaseCrudForm>;
+    FGridSource: TDataSource;
+    FGridProvider: TDataSetProvider;
+    FGridData: TClientDataSet;
+
+    procedure StartTransaction;
+    procedure CommitTransaction;
+    procedure RollbackTransaction;
+    procedure UpdateDetailValues;
+    procedure DetailOpenData(ARecordId: Variant); overload;
+    procedure RefreshGridData;
+    function InternalSave: Boolean;
+    function NextSequenceValue(const ASequenceName: string): Variant;
+  protected
+
+    function Save: Boolean;
+    function GetKeyFieldName: String; virtual; abstract;
+    function NewId: Variant;
+    function GetSequenceName: string; virtual; abstract;
+    function IncrementalSave(ACommit: Boolean): Boolean;
+    function GetSqlRows: string;
+    function GetSqlNoRows: string;
+
+    procedure Edit;
+    procedure OpenData;
+    procedure DetailOpenData; overload;
+    procedure DetailEdit;
+    procedure DetailNew;
+    procedure ClickOnSave; virtual;
+
+    property KeyFieldName: string read GetKeyFieldName;
+    property SequenceName: string read GetSequenceName;
+  public
+    { Public declarations }
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    function GetIsMaster: Boolean; virtual; abstract;
+    function GetTableName: String; virtual; abstract;
+    function GetDataSet: TDataSet;
+    procedure SetMasterCrud(const Value: TBaseCrudForm);
+    procedure SetDetailFieldName(const Value: string);
+    function InsertRecord(ARecordValues: TDictionary<string, Variant>;
+      AutoCommit: Boolean = True): Boolean; overload;
+    procedure NewRecord; virtual;
+    procedure AfterConstruction; override;
+
+    property DataSet: TDataSet read GetDataSet;
+    property MasterCrud: TBaseCrudForm read FMasterCrud write SetMasterCrud;
+    property DetailFieldName: string read FDetailFieldName write SetDetailFieldName;
+    property RecordId: Variant read FRecordId write FRecordId;
+    property TableName: string read GetTableName;
+    property IsMaster: Boolean read GetIsMaster;
+    property DetailList: TList<TBaseCrudForm> read FDetailList write FDetailList;
+    property GridSource: TDataSource read FGridSource;
+  end;
+
+var
+  BaseCrudForm: TBaseCrudForm;
+
+implementation
+
+{$R *.dfm}
+
+{ TBaseCrudForm }
+procedure TBaseCrudForm.AfterConstruction;
+begin
+  inherited;
+  FGridData := TClientDataSet.Create(Self);
+  FGridSource := TDataSource.Create(Self);
+  FGridProvider := TDataSetProvider.Create(Self);
+  FGridProvider.Name := 'GridProvider';
+  FGridProvider.Options := [poNoReset];
+  FGridProvider.DataSet := Dataset;
+  FGridData.ReadOnly := True;
+  FGridData.ProviderName := FGridProvider.Name;
+  FGridSource.DataSet := FGridData;
+end;
+
+procedure TBaseCrudForm.btnSalvarClick(Sender: TObject);
+begin
+  ClickOnSave;
+end;
+
+procedure TBaseCrudForm.ClickOnSave;
+begin
+  if Save then
+  begin
+    CommitTransaction;
+    ShowMessage('Salvo com sucesso!');
+  end;
+end;
+
+procedure TBaseCrudForm.CommitTransaction;
+begin
+  FConnection.GetConnection.Commit;
+  //RefreshGridData;
+end;
+
+constructor TBaseCrudForm.Create(AOwner: TComponent);
+begin
+  inherited;
+  FDetailList := TList<TBaseCrudForm>.Create;
+  FConnection := TConnectionService.New;
+  tbDefault.Connection := FConnection.GetConnection;
+end;
+
+destructor TBaseCrudForm.Destroy;
+begin
+  FDetailList.Free;
+  inherited;
+end;
+
+procedure TBaseCrudForm.DetailEdit;
+var
+  DetailForm: TBaseCrudForm;
+begin
+  for DetailForm in FDetailList do
+  begin
+    DetailForm.DetailOpenData(FRecordId);
+    DetailForm.Edit;
+  end;
+end;
+
+procedure TBaseCrudForm.DetailNew;
+var
+  DetailForm: TBaseCrudForm;
+begin
+  for DetailForm in FDetailList do
+  begin
+    DetailForm.NewRecord;
+  end;
+end;
+
+procedure TBaseCrudForm.DetailOpenData;
+var
+  DetailForm: TBaseCrudForm;
+  KeyField: TField;
+begin
+  KeyField := DataSet.FieldByName(KeyFieldName);
+  FRecordId := KeyField.Value;
+
+  for DetailForm in FDetailList do
+  begin
+    DetailForm.DetailOpenData(FRecordId);
+  end;
+end;
+
+procedure TBaseCrudForm.Edit;
+begin
+  OpenData;
+  if not IsMaster and not tbDefault.Active then
+    tbDefault.Open;
+  DataSet.Edit;
+  DetailEdit;
+end;
+
+procedure TBaseCrudForm.DetailOpenData(ARecordId: Variant);
+begin
+  Assert(not IsMaster);
+
+  cdsDefault.Close;
+
+  if VarIsNull(ARecordId) or VarIsClear(ARecordId) then
+  begin
+    tbDefault.SQL.Text := GetSqlNoRows;
+  end
+  else
+  begin
+    tbDefault.SQL.Text := GetSqlRows;
+    tbDefault.ParamByName(DetailFieldName).Value := ARecordId;
+  end;
+
+  //tbDefault.Open;
+  //  FGridProvider.DataSet := DataSet;
+  cdsDefault.Open;
+
+  FGridData.Close;
+  FGridData.Open;
+  DetailOpenData;
+
+end;
+
+function TBaseCrudForm.GetDataSet: TDataSet;
+begin
+  Result := tbDefault;
+end;
+
+function TBaseCrudForm.GetSqlNoRows: string;
+begin
+  Result := Format('SELECT FIRST 0 * FROM %s', [TableName]);
+end;
+
+function TBaseCrudForm.GetSqlRows: string;
+const
+  FilterFormat = '%0:s %1:s=:%1:s';
+var
+  AndClause: string;
+  Key: string;
+  Where: string;
+begin
+  AndClause := '';
+  Where := '';
+  Result := 'SELECT * FROM ' + TableName;
+
+  if IsMaster then
+  begin
+    Where := Where + Format(FilterFormat, [AndClause, KeyFieldName]);
+  end
+  else
+  begin
+    Where := Where + Format(FilterFormat, [AndClause, DetailFieldName]);
+  end;
+
+  if (Where <> '') then
+  begin
+    Result := Result + ' WHERE ' + Where;
+  end;
+end;
+
+function TBaseCrudForm.IncrementalSave(ACommit: Boolean): Boolean;
+begin
+  //DataSet.DisableControls;
+  try
+    Result := Save;
+    if Result then
+    begin
+      CommitTransaction;
+      StartTransaction;
+      Edit;
+    end;
+  finally
+    //DataSet.EnableControls;
+    dsDefault.DataSet := DataSet;
+  end;
+end;
+
+function TBaseCrudForm.InsertRecord(ARecordValues: TDictionary<string, Variant>;
+  AutoCommit: Boolean): Boolean;
+var
+  I: Integer;
+begin
+  try
+    MasterCrud.StartTransaction;
+    if MasterCrud.IncrementalSave(False) then
+    begin
+      MasterCrud.CommitTransaction;
+    end
+    else
+    begin
+      MasterCrud.RollbackTransaction;
+      Result := False;
+      Exit;
+    end;
+
+    MasterCrud.StartTransaction;
+    NewRecord;
+    for I := 0 to DataSet.Fields.Count - 1 do
+    begin
+      if ARecordValues.ContainsKey(DataSet.Fields[I].FieldName) then
+      begin
+        DataSet.FieldByName(DataSet.Fields[I].FieldName).AsVariant :=
+          ARecordValues[DataSet.Fields[I].FieldName];
+      end;
+    end;
+
+    Result := Save;
+    if Result then
+    begin
+      MasterCrud.CommitTransaction;
+      //RefreshGridData;
+      DetailOpenData;
+    end
+    else
+    begin
+      RollbackTransaction;
+    end;
+  finally
+    dsDefault.DataSet := DataSet;
+    FGridProvider.DataSet := Dataset;
+    FGridSource.DataSet := Dataset;
+  end;
+end;
+
+function TBaseCrudForm.InternalSave: Boolean;
+var
+  KeyField: TField;
+begin
+  KeyField := DataSet.FieldByName(KeyFieldName);
+
+  if VarIsNull(KeyField.Value) then
+  begin
+    KeyField.Value := NewId;
+  end;
+
+  UpdateDetailValues;
+  DataSet.Post;
+  FRecordId := KeyField.Value;
+  Result := True;
+end;
+
+procedure TBaseCrudForm.NewRecord;
+begin
+  FRecordId := Null;
+  OpenData;
+  if not IsMaster and not tbDefault.Active then
+    tbDefault.Open;
+  DataSet.Append;
+  DetailOpenData;
+  DetailNew;
+end;
+
+function TBaseCrudForm.NewId: Variant;
+begin
+  Result := NextSequenceValue(SequenceName);
+end;
+
+function TBaseCrudForm.NextSequenceValue(const ASequenceName: string): Variant;
+begin
+  Result := FConnection.NextSequenceValue(ASequenceName);
+end;
+
+procedure TBaseCrudForm.OpenData;
+begin
+  if IsMaster then
+  begin
+    tbDefault.Close;
+    if VarIsNull(FRecordId) or VarIsClear(FRecordId) then
+    begin
+      tbDefault.SQL.Text := GetSqlNoRows;
+    end
+    else
+    begin
+      tbDefault.SQL.Text := GetSqlRows;
+      tbDefault.ParamByName(KeyFieldName).Value := FRecordId;
+    end;
+
+    tbDefault.Open;
+    DetailOpenData;
+  end
+  else
+  begin
+    if not(VarIsNull(FRecordId) or VarIsClear(FRecordId)) then
+    begin
+      if not tbDefault.Active then
+        tbDefault.Open;
+
+      tbDefault.Locate(KeyFieldName, VarArrayOf([FRecordId]), []);
+    end;
+  end;
+
+  dsDefault.DataSet := DataSet;
+end;
+
+procedure TBaseCrudForm.RefreshGridData;
+begin
+  if not IsMaster then
+  begin
+    try
+      //FGridData.Close;
+
+      if VarIsNull(MasterCrud.FRecordId) or VarIsClear(MasterCrud.FRecordId) then
+      begin
+        tbDefault.SQL.Text := GetSqlNoRows;
+      end
+      else
+      begin
+        tbDefault.SQL.Text := GetSqlRows;
+        tbDefault.ParamByName(DetailFieldName).Value := MasterCrud.FRecordId;
+      end;
+
+      tbDefault.open;
+    finally
+      FGridProvider.DataSet := Dataset;
+      FGridData.ProviderName := FGridProvider.Name;
+      FGridSource.Dataset := FGridData;
+      FGridData.Open;
+    end;
+  end;
+end;
+
+procedure TBaseCrudForm.RollbackTransaction;
+begin
+  FConnection.GetConnection.Rollback;
+end;
+
+function TBaseCrudForm.Save: Boolean;
+begin
+  Assert(DataSet.State in [dsEdit, dsInsert]);
+  Result := InternalSave;
+end;
+
+procedure TBaseCrudForm.SetDetailFieldName(const Value: string);
+begin
+  FDetailFieldName := Value;
+end;
+
+procedure TBaseCrudForm.SetMasterCrud(const Value: TBaseCrudForm);
+begin
+  FMasterCrud := Value;
+end;
+
+procedure TBaseCrudForm.StartTransaction;
+begin
+  FConnection.GetConnection.StartTransaction;
+end;
+
+procedure TBaseCrudForm.UpdateDetailValues;
+begin
+  if (not IsMaster) then
+  begin
+    tbDefault.FieldByName(FDetailFieldName).Value := MasterCrud.RecordId;
+  end;
+end;
+
+end.

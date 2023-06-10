@@ -1,0 +1,15 @@
+inherited AbastecimentoItemForm: TAbastecimentoItemForm
+  Caption = 'AbastecimentoItemForm'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited tbDefault: TFDQuery
+    SQL.Strings = (
+      'SELECT *  FROM ABASTECIMENTO_ITEM')
+  end
+  inherited cdsDefault: TClientDataSet
+    object cdsDefaultQUANTIDADE: TFloatField
+      FieldName = 'QUANTIDADE'
+      DisplayFormat = '#,##00.00'
+    end
+  end
+end

@@ -1,0 +1,53 @@
+unit Fortes.Services.Kernel.ICrudService;
+
+interface
+
+uses
+  Vcl.Controls, Data.Db, Total.Kernel.BaseCrud, System.Generics.Collections,
+  Total.Data.Context, cxPC;
+
+type
+  ICrudService = interface
+    ['{38CA145D-0F51-4B2D-B1EA-9C2D3D909AD2}']
+    function DeleteRecord(const ARecordId: Variant; Silent: Boolean = False): Boolean;
+    function EditRecord(const ARecordId: Variant;
+      AFullScreen: Boolean = False; ASelfClosing: Boolean = True): Boolean; overload;
+    function GetGridSource: TDataSource;
+    function GetDataSet: TDataSet;
+    function GetTableName: string;
+    function InsertRecord(out ARecordId: Variant): Boolean; overload;
+    function InsertRecord(ARecordValues: TDictionary<string, Variant>;
+      AutoCommit: Boolean = True): Boolean; overload;
+    function InsertRecord(ARecordValues: TDictionary<string, Variant>;
+      ADataContext: TDataContext): Boolean; overload;
+    function BrowseRecord(ARecordId: Variant; AFullScreen: Boolean = False;
+      Silent: Boolean = False): Boolean;
+    function GetFormVisible: Boolean;
+    procedure ClearFilter;
+    procedure Filter(const AFieldName: string; const AValue: Variant);
+    procedure OneToOne(AMasterCrud: TBaseCrudForm; ADetailFieldName: string;
+      ADockSite: TWinControl; ARequired: Boolean = True);
+    procedure OneToMany(AMasterCrud: TBaseCrudForm; ADetailFieldName: string);
+    function GetValue(const AKey: string): Variant;
+    procedure SetValue(const AKey: string; const AValue: Variant);
+    procedure SetValueInsert(const AFieldName: string; const AValue: Variant);
+    procedure MakeLocal;
+    procedure SetFormVisible(Value: Boolean = True);
+    procedure ShowFullScreen;
+    procedure Caption(const ACaption: string);
+    procedure ItsSelfService(const AConfirmation: Boolean = False);
+    procedure EditRecord(ARecordId: Variant; ActivePage: TcxTabSheet); overload;
+    procedure DoControls;
+    function GetCanBeShow: Boolean;
+    procedure GridReadOnly(AValue: Boolean = True);
+    function GetCurrentForm: TBaseCrudForm;
+    procedure SetSilentSave(AValue: Boolean = True);
+    procedure RefreshGridData(AIdPedido: Integer);
+    procedure RefreshControls;
+    procedure SetFKAutomatic(Automatic: Boolean);
+    function InsertDictionary(ARecordValues: TDictionary<string, Variant>): Boolean;
+  end;
+
+implementation
+
+end.

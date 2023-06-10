@@ -1,0 +1,58 @@
+unit Fortes.View.AbastecimentoItem;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Fortes.View.Base.BaseCrud,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, Datasnap.DBClient, Datasnap.Provider,
+  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
+  Fortes.Kernel.Databaseconst, Vcl.StdCtrls, Vcl.Mask, Vcl.DBCtrls, Vcl.ExtCtrls,
+  FireDAC.UI.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Phys,
+  FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.VCLUI.Wait;
+
+type
+  TAbastecimentoItemForm = class(TBaseCrudForm)
+  private
+    { Private declarations }
+  protected
+    function GetKeyFieldName: string; override;
+    function GetTableName: String; override;
+    function GetSequenceName: string; override;
+    function GetIsMaster: Boolean; override;
+  public
+    { Public declarations }
+  end;
+
+var
+  AbastecimentoItemForm: TAbastecimentoItemForm;
+
+implementation
+
+{$R *.dfm}
+
+{ TAbastecimentoItemForm }
+
+function TAbastecimentoItemForm.GetIsMaster: Boolean;
+begin
+  Result := False;
+end;
+
+function TAbastecimentoItemForm.GetKeyFieldName: string;
+begin
+  Result := AbastecimentoItem.FIELD_ID_ABASTECIMENTO_ITEM;
+end;
+
+function TAbastecimentoItemForm.GetSequenceName: string;
+begin
+  Result := AbastecimentoItem.SEQUENCE_NAME;
+end;
+
+function TAbastecimentoItemForm.GetTableName: String;
+begin
+  Result := AbastecimentoItem.TABLE_NAME;
+end;
+
+end.

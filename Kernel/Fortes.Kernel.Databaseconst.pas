@@ -1,0 +1,56 @@
+unit Fortes.Kernel.Databaseconst;
+
+interface
+
+type
+  Combustivel = Record
+  public const
+    TABLE_NAME = 'COMBUSTIVEL';
+    SEQUENCE_NAME = 'GEN_COMBUSTIVEL_ID';
+    FIELD_ID_COMBUSTIVEL = 'ID_COMBUSTIVEL';
+    FIELD_DESCRICAO = 'DESCRICAO';
+    FIELD_VALOR = 'VALOR';
+    FIELD_PERCENTUAL_ICMS = 'PERCENTUAL_ICMS';
+  end;
+
+  Abastecimento = Record
+  public const
+    TABLE_NAME = 'ABASTECIMENTO';
+    SEQUENCE_NAME = 'GEN_ABASTECIMENTO_ID';
+    FIELD_ID_ABASTECIMENTO = 'ID_ABASTECIMENTO';
+    FIELD_DATA = 'DATA';
+  end;
+
+  AbastecimentoItem = Record
+  public const
+    TABLE_NAME = 'ABASTECIMENTO_ITEM';
+    SEQUENCE_NAME = 'GEN_ABASTECIMENTO_ITEM_ID';
+    FIELD_ID_ABASTECIMENTO_ITEM = 'ID_ABASTECIMENTO_ITEM';
+    FIELD_ID_ABASTECIMENTO = 'ID_ABASTECIMENTO';
+    FIELD_ID_COMBUSTIVEL   = 'ID_COMBUSTIVEL';
+    FIELD_QUANTIDADE = 'QUANTIDADE';
+    FIELD_VALOR_ICMS = 'VALOR_ICMS';
+    FIELD_VALOR = 'VALOR';
+    FIELD_TOTAL = 'TOTAL';
+  end;
+
+  Tanque = Record
+  public const
+    TABLE_NAME = 'TANQUE';
+    SEQUENCE_NAME = 'GEN_TANQUE_ID';
+    FIELD_ID_TANQUE = 'ID_TANQUE';
+    FIELD_ID_COMBUSTIVEL   = 'ID_COMBUSTIVEL';
+  end;
+
+  Bomba = Record
+  public const
+    TABLE_NAME = 'BOMBA';
+    SEQUENCE_NAME = 'GEN_BOMBA_ID';
+    FIELD_ID_BOMBA  = 'ID_BOMBA';
+    FIELD_ID_TANQUE = 'ID_TANQUE';
+
+  end;
+
+implementation
+
+end.

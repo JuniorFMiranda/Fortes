@@ -1,0 +1,281 @@
+unit Fortes.View.Abastecimento;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Fortes.View.Base.BaseCrud, Vcl.StdCtrls,
+  Vcl.Mask, Vcl.Buttons, Data.DB, Vcl.Grids, Vcl.DBGrids,
+  Fortes.Services.Kernel.FindService, Fortes.View.PesquisaCombustivel,
+  System.Generics.Collections, Fortes.Kernel.Databaseconst, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  Datasnap.DBClient, Datasnap.Provider, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, Fortes.Services.Kernel.CrudService,
+  Fortes.Services.Kernel.ICrudService, Fortes.View.AbastecimentoItem,
+  Vcl.DBCtrls, System.Math, Vcl.ExtCtrls, Fortes.Abastecimento.Utils;
+
+type
+  TAbastecimentoForm = class(TBaseCrudForm)
+    edtCombustivel: TEdit;
+    lblCombustivel: TLabel;
+    lblQuantidade: TLabel;
+    lblPreco: TLabel;
+    lblIcms: TLabel;
+    dbgItens: TDBGrid;
+    lblTotal: TLabel;
+    edtCodigo: TEdit;
+    btnAdicionar: TButton;
+    btnBuscar: TButton;
+    edtQuantidade: TDBEdit;
+    cdsFields: TClientDataSet;
+    cdsFieldsQUANTIDADE: TFloatField;
+    cdsFieldsPRECO: TFloatField;
+    cdsFieldsICMS: TFloatField;
+    cdsFieldsTOTAL: TFloatField;
+    dsFields: TDataSource;
+    edtPreco: TDBEdit;
+    edtIcms: TDBEdit;
+    edtTotal: TDBEdit;
+    procedure btnBuscarClick(Sender: TObject);
+    procedure btnAdicionarClick(Sender: TObject);
+    procedure btnSalvarClick(Sender: TObject);
+  private
+    { Private declarations }
+    FAbastecimentoItem: ICrudService;
+
+    procedure FindCombustivelAfterFind(Sender: TObject;
+      Values: TDictionary<String, Variant>);
+    procedure ReniciarValoresDosCampos;
+    function ValidarSeCampoCombustivelVazio: Boolean;
+    function ValidarSeNaoHaRegistroInserido(Silent: Boolean = False): Boolean;
+    function ValidarSeCampoQuantidadeVazio: Boolean;
+    function DoTotalizarAbastecimento: Double;
+  protected
+    procedure BuscarCombustivel;
+    procedure AfterConstruction; override;
+    procedure DoShow; override;
+    procedure ClickOnSave; override;
+    procedure AdicionarCombustivelNaVenda;
+    function GetKeyFieldName: string; override;
+    function GetTableName: String; override;
+    function GetSequenceName: string; override;
+    function GetIsMaster: Boolean; override;
+    procedure TotalizarAbastecimento;
+    function ValidarCamposObrigatorios: Boolean;
+    function TotalDeRegistrosLancados: Integer;
+  public
+    { Public declarations }
+    constructor Create(AOwner: TComponent); override;
+    procedure NewRecord; override;
+  end;
+
+var
+  AbastecimentoForm: TAbastecimentoForm;
+
+implementation
+
+{$R *.dfm}
+
+const
+  MSG_CAMPO_NAO_INFORMADO = 'Informe o campo %s.';
+
+{ TAbastecimentoForm }
+
+procedure TAbastecimentoForm.AdicionarCombustivelNaVenda;
+var
+  Values: TDictionary<string, Variant>;
+  Total: Double;
+begin
+  if ValidarCamposObrigatorios then
+    Exit;
+
+  Total := cdsFieldsQUANTIDADE.AsFloat * cdsFieldsPRECO.AsFloat;
+
+  Values := TDictionary<string, Variant>.Create;
+  try
+    Values.Add(AbastecimentoItem.FIELD_ID_COMBUSTIVEL, edtCodigo.Text);
+    Values.Add(Combustivel.FIELD_DESCRICAO, edtCombustivel.Text);
+    Values.Add(AbastecimentoItem.FIELD_QUANTIDADE, cdsFieldsQUANTIDADE.AsFloat);
+    Values.Add(AbastecimentoItem.FIELD_VALOR, cdsFieldsPRECO.AsFloat);
+    Values.Add(Combustivel.FIELD_PERCENTUAL_ICMS, cdsFieldsICMS.AsFloat);
+    Values.Add(AbastecimentoItem.FIELD_VALOR_ICMS,
+      TAbastecimentoUtils.CalcularIcmsSobreAbastecimento(Total, cdsFieldsICMS.AsFloat));
+    Values.Add(AbastecimentoItem.FIELD_TOTAL, RoundTo(Total, -2));
+
+    FAbastecimentoItem.InsertRecord(Values);
+    ReniciarValoresDosCampos;
+    TotalizarAbastecimento;
+    TAbastecimentoUtils.DimensionarGrid(dbgItens);
+  finally
+    Values.Free;
+  end;
+end;
+
+procedure TAbastecimentoForm.AfterConstruction;
+begin
+  inherited;
+  cdsFields.Insert;
+  TAbastecimentoUtils.DimensionarGrid(dbgItens);
+end;
+
+procedure TAbastecimentoForm.btnAdicionarClick(Sender: TObject);
+begin
+  inherited;
+  AdicionarCombustivelNaVenda;
+end;
+
+procedure TAbastecimentoForm.btnBuscarClick(Sender: TObject);
+begin
+  inherited;
+  BuscarCombustivel;
+end;
+
+procedure TAbastecimentoForm.btnSalvarClick(Sender: TObject);
+begin
+  if ValidarSeNaoHaRegistroInserido and ValidarCamposObrigatorios then
+    Exit;
+
+  if ValidarSeNaoHaRegistroInserido then
+    Exit;
+
+  inherited;
+end;
+
+procedure TAbastecimentoForm.BuscarCombustivel;
+begin
+  TFindService<TFindPesquisarCombustivelForm>
+   .New
+   .AddAfterFindListener(FindCombustivelAfterFind)
+   .ShowModal;
+end;
+
+procedure TAbastecimentoForm.ClickOnSave;
+begin
+  inherited;
+  NewRecord;
+end;
+
+constructor TAbastecimentoForm.Create(AOwner: TComponent);
+begin
+  inherited;
+  FAbastecimentoItem := TCrudService<TAbastecimentoItemForm>.New;
+  FAbastecimentoItem.OneToMany(Self, AbastecimentoItem.FIELD_ID_ABASTECIMENTO);
+
+  dbgItens.DataSource := FAbastecimentoItem.GetGridSource;
+
+  Self.DetailList.Add(FAbastecimentoItem.GetForm);
+end;
+
+procedure TAbastecimentoForm.DoShow;
+begin
+  inherited;
+  ReniciarValoresDosCampos;
+end;
+
+function TAbastecimentoForm.DoTotalizarAbastecimento: Double;
+begin
+  FAbastecimentoItem.GetGridSource.DataSet.DisableControls;
+  try
+    Result := 0;
+    FAbastecimentoItem.GetGridSource.DataSet.First;
+    while not FAbastecimentoItem.GetGridSource.DataSet.Eof do
+    begin
+      Result := RoundTo(Result + FAbastecimentoItem.GetGridSource
+        .DataSet.FieldByName(AbastecimentoItem.FIELD_TOTAL).AsFloat, -2);
+      FAbastecimentoItem.GetGridSource.DataSet.Next;
+    end;
+  finally
+    FAbastecimentoItem.GetGridSource.DataSet.EnableControls
+  end;
+end;
+
+procedure TAbastecimentoForm.FindCombustivelAfterFind(Sender: TObject;
+  Values: TDictionary<String, Variant>);
+begin
+  edtCodigo.Text := Values[Combustivel.FIELD_ID_COMBUSTIVEL];
+  edtCombustivel.Text := Values[Combustivel.FIELD_DESCRICAO];
+  cdsFieldsPRECO.AsFloat := Values[Combustivel.FIELD_VALOR];
+  cdsFieldsICMS.AsFloat := Values[Combustivel.FIELD_PERCENTUAL_ICMS];
+end;
+
+function TAbastecimentoForm.GetIsMaster: Boolean;
+begin
+  Result := True;
+end;
+
+function TAbastecimentoForm.GetKeyFieldName: string;
+begin
+  Result := Abastecimento.FIELD_ID_ABASTECIMENTO;
+end;
+
+function TAbastecimentoForm.GetSequenceName: string;
+begin
+  Result := Abastecimento.SEQUENCE_NAME;
+end;
+
+function TAbastecimentoForm.GetTableName: String;
+begin
+  Result := Abastecimento.TABLE_NAME;
+end;
+
+procedure TAbastecimentoForm.ReniciarValoresDosCampos;
+begin
+  edtCodigo.Clear;
+  edtCombustivel.Clear;
+  cdsFieldsQUANTIDADE.AsFloat := 0;
+  cdsFieldsPRECO.AsFloat := 0;
+  cdsFieldsICMS.AsFloat := 0;
+  cdsFieldsTOTAL.AsFloat := 0;
+end;
+
+function TAbastecimentoForm.TotalDeRegistrosLancados: Integer;
+begin
+  Result := dbgItens.DataSource.DataSet.RecordCount
+end;
+
+procedure TAbastecimentoForm.TotalizarAbastecimento;
+begin
+  cdsFieldsTOTAL.AsFloat := DoTotalizarAbastecimento;
+end;
+
+function TAbastecimentoForm.ValidarCamposObrigatorios: Boolean;
+begin
+  Result := ValidarSeCampoCombustivelVazio or ValidarSeCampoQuantidadeVazio;
+end;
+
+function TAbastecimentoForm.ValidarSeCampoCombustivelVazio: Boolean;
+begin
+  Result := edtCombustivel.Text = '';
+  if Result then
+  begin
+    ShowMessage(Format(MSG_CAMPO_NAO_INFORMADO, [lblCombustivel.Caption]));
+  end;
+end;
+
+function TAbastecimentoForm.ValidarSeCampoQuantidadeVazio: Boolean;
+begin
+  Result := cdsFieldsQUANTIDADE.AsFloat <= 0;
+  if Result then
+  begin
+    ShowMessage(Format(MSG_CAMPO_NAO_INFORMADO, [lblQuantidade.Caption]));
+  end;
+end;
+
+function TAbastecimentoForm.ValidarSeNaoHaRegistroInserido: Boolean;
+begin
+  Result := TotalDeRegistrosLancados = 0;
+  if Result then
+  begin
+    ShowMessage('Informe ao menos um combustível para finalizar esse abastecimento.');
+  end;
+end;
+
+procedure TAbastecimentoForm.NewRecord;
+begin
+  inherited;
+  DataSet.FieldByName(Abastecimento.FIELD_DATA).AsDateTime := Now;
+  ReniciarValoresDosCampos;
+end;
+
+end.

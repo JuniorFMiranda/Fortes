@@ -1,0 +1,7 @@
+unit Fortes.Services.Kernel.IFormService;
+
+interface
+
+implementation
+
+end.

@@ -1,0 +1,17 @@
+unit Fortes.Services.Connection.IConnectionService;
+
+interface
+
+uses
+  Firedac.Comp.Client;
+
+tyoe
+ IConnectionService = interface
+    function GetConnection: FDConnection;
+
+ end;
+
+
+implementation
+
+end.

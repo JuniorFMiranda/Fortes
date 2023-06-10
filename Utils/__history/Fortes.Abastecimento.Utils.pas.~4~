@@ -1,0 +1,24 @@
+unit Fortes.Abastecimento.Utils;
+
+interface
+
+uses
+  System.Math;
+
+type
+  TAbastecimentoUtils = class
+    class function CalcularIcmsSobreAbastecimento(AValorTotal: Double;
+      AliquotaIcms: Double): Double;
+  end;
+
+implementation
+
+{ TAbastecimentoUtils }
+
+class function TAbastecimentoUtils.CalcularIcmsSobreAbastecimento(AValorTotal,
+  AliquotaIcms: Double): Double;
+begin
+  Result := RoundTo(AValorTotal * (AliquotaIcms/100), -2);
+end;
+
+end.

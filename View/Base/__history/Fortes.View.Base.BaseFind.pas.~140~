@@ -1,0 +1,263 @@
+unit Fortes.View.Base.BaseFind;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids,
+  Vcl.StdCtrls, Vcl.ExtCtrls, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, Fortes.Services.Connection.IConnectionService,
+  Fortes.Services.Connection.ConnectionService, Fortes.Kernel.Messages,
+  System.Generics.Collections, Fortes.Services.Kernel.IFindService;
+
+type
+  TBaseFindForm = class(TForm)
+    pnlFooter: TPanel;
+    btnOk: TButton;
+    lblPesquisa: TLabel;
+    edtPesquisa: TEdit;
+    dbgPesquisa: TDBGrid;
+    qryFind: TFDQuery;
+    dsFind: TDataSource;
+    tmDelayFind: TTimer;
+    pnlSummary: TPanel;
+    lblRecordCount: TLabel;
+    lblRecordCaption: TLabel;
+    lblResults: TLabel;
+    procedure FormCreate(Sender: TObject);
+    procedure tmDelayFindTimer(Sender: TObject);
+    procedure btnOkClick(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure dbgPesquisaDblClick(Sender: TObject);
+  private
+    { Private declarations }
+    FConnectionService: IConnectionService;
+    FFilteredColumn: TColumn;
+    FAfterFindListeners: TList<TAfterFindEvent>;
+
+    function GetRowCount: Integer;
+    function GetEntityNameSingular: String;
+    function GetEntityNamePlural: String;
+    function GetFieldValues: TDictionary<string, Variant>;
+    procedure Filter(AFieldName: string; AFilterValue: Variant);overload;
+    procedure TMRefreshSummary(var Msg: TMessage); message TM_REFRESH_SUMMARY;
+    procedure RefreshSummary;
+    procedure DoAfterfind(AValues: TDictionary<String, Variant>);
+    procedure FindOk;
+  protected
+    procedure Filter; overload;
+    function AddAfterFindListener(const AListener: TAfterFindEvent): TBaseFindForm;
+
+    property RowCount: Integer read GetRowCount;
+    property EntityNameSingular: String read GetEntityNameSingular;
+    property EntityNamePlural: String read GetEntityNamePlural;
+  public
+    { Public declarations }
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  end;
+
+var
+  BaseFindForm: TBaseFindForm;
+
+implementation
+
+{$R *.dfm}
+
+function TBaseFindForm.AddAfterFindListener(
+  const AListener: TAfterFindEvent): TBaseFindForm;
+begin
+  FAfterFindListeners.Add(AListener);
+  Result := Self;
+end;
+
+procedure TBaseFindForm.btnOkClick(Sender: TObject);
+begin
+  FindOk;
+end;
+
+procedure TBaseFindForm.Filter;
+var
+  FilterValue: Variant;
+  FieldName: string;
+begin
+  FilterValue := edtPesquisa.Text;
+  FieldName := dbgPesquisa.Columns.Grid.SelectedField.FieldName;
+  Filter(FieldName, FilterValue);
+end;
+
+constructor TBaseFindForm.Create(AOwner: TComponent);
+begin
+  inherited;
+  FAfterFindListeners := TList<TAfterFindEvent>.create;
+end;
+
+procedure TBaseFindForm.dbgPesquisaDblClick(Sender: TObject);
+begin
+  FindOk;
+end;
+
+destructor TBaseFindForm.Destroy;
+begin
+  FAfterFindListeners.Free;
+  inherited;
+end;
+
+procedure TBaseFindForm.DoAfterfind(AValues: TDictionary<String, Variant>);
+var
+  Listner: TAfterFindEvent;
+begin
+  for Listner in FAfterFindListeners do
+  begin
+    Listner(Self, AValues);
+  end;
+end;
+
+procedure TBaseFindForm.FindOk;
+var
+  Values: TDictionary<string, Variant>;
+begin
+  Values := GetFieldValues;
+  try
+    DoAfterfind(Values);
+  finally
+    Values.Free;
+  end;
+end;
+
+procedure TBaseFindForm.Filter(AFieldName: string; AFilterValue: Variant);
+var
+  FilterValueStr: string;
+begin
+  dbgPesquisa.DataSource.DataSet.DisableControls;
+  try
+    FilterValueStr := '%' + AFilterValue + '%';
+
+    qryFind.Filtered := False;
+    if FilterValueStr <> '%%' then
+    begin
+      qryFind.Filter := Format('upper(%s) like upper(%s)', [AFieldName, QuotedStr(FilterValueStr)]);
+      qryFind.Filtered := True;
+    end;
+  finally
+    RefreshSummary;
+    dbgPesquisa.DataSource.DataSet.EnableControls;
+  end;
+end;
+
+procedure TBaseFindForm.FormCreate(Sender: TObject);
+begin
+  edtPesquisa.Clear;
+  edtPesquisa.Enabled := False;
+  dbgPesquisa.ReadOnly := True;
+
+  FConnectionService := TConnectionService.New;
+  qryFind.Connection := FConnectionService.GetConnection;
+  dsFind.DataSet := qryFind;
+  dbgPesquisa.DataSource := dsFind;
+  qryFind.open;
+end;
+
+procedure TBaseFindForm.FormKeyPress(Sender: TObject; var Key: Char);
+var
+  Column: TColumn;
+  IsRestartTimerNeeded: Boolean;
+begin
+  IsRestartTimerNeeded := False;
+
+  Column := dbgPesquisa.Columns[dbgPesquisa.Columns.Grid.SelectedField.Index];
+
+  if (Column = Nil) and (dbgPesquisa.Columns.Count > 0) then
+  begin
+    Column := dbgPesquisa.Columns[0];
+  end;
+
+  if (FFilteredColumn <> Column) then
+  begin
+    FFilteredColumn := Column;
+    edtPesquisa.Text := '';
+  end;
+
+  if CharInSet(Key, [#32 .. #255]) then // Caracteres
+  begin
+    edtPesquisa.Text := edtPesquisa.Text + Key;
+    IsRestartTimerNeeded := True;
+  end
+  else if Key = #8 then // Backspace
+  begin
+    edtPesquisa.Text := Copy(edtPesquisa.Text, 1, Length(edtPesquisa.Text) - 1);
+    IsRestartTimerNeeded := True;
+  end
+  else if Key = #27 then // Escape
+  begin
+    ModalResult := mrCancel;
+  end
+  else if Key = #13 then // Enter
+  begin
+    FindOk;
+  end;
+
+  if IsRestartTimerNeeded then
+  begin
+    tmDelayFind.Enabled := False;
+    tmDelayFind.Enabled := True;
+  end;
+end;
+
+function TBaseFindForm.GetEntityNamePlural: String;
+begin
+  Result := 'Registros';
+end;
+
+function TBaseFindForm.GetEntityNameSingular: String;
+begin
+  Result := 'Registro';
+end;
+
+function TBaseFindForm.GetFieldValues: TDictionary<string, Variant>;
+var
+  I: Integer;
+  Column: TColumn;
+  Value: Variant;
+begin
+  Result := TDictionary<string, Variant>.Create;
+  for I := 0 to dbgPesquisa.Columns.Count - 1 do
+  begin
+    Column := dbgPesquisa.Columns[I];
+    Value  := Column.Field.AsVariant;
+    Result.Add(Column.FieldName, Value);
+  end;
+end;
+
+function TBaseFindForm.GetRowCount: Integer;
+begin
+  Result := dbgPesquisa.DataSource.DataSet.RecordCount;
+end;
+
+procedure TBaseFindForm.RefreshSummary;
+begin
+  PostMessage(Handle, TM_REFRESH_SUMMARY, 0, 0);
+end;
+
+procedure TBaseFindForm.tmDelayFindTimer(Sender: TObject);
+begin
+  tmDelayFind.Enabled := False;
+  Filter;
+end;
+
+procedure TBaseFindForm.TMRefreshSummary(var Msg: TMessage);
+begin
+  lblRecordCount.Caption := IntToStr(RowCount);
+  if RowCount = 1 then
+  begin
+    lblRecordCaption.Caption := EntityNameSingular;
+  end
+  else
+  begin
+    lblRecordCaption.Caption := EntityNamePlural;
+  end;
+end;
+
+end.

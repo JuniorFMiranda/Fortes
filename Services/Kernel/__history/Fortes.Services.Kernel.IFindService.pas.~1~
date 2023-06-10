@@ -1,0 +1,7 @@
+unit Fortes.Services.Kernel.FindService;
+
+interface
+
+implementation
+
+end.

@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2023/06/07 10:42:47.000.176,=C:\Users\flmir\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/06/07 10:43:12.000.258,=C:\Users\flmir\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>2023/06/07 10:46:34.000.618,C:\Projetos\Fortes\Services\Connection\Fortes.Services.Connection.IConnectionService.pas=C:\Users\flmir\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>2023/06/07 10:51:43.000.871,=C:\Users\flmir\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>2023/06/07 11:03:17.000.775,C:\Projetos\Fortes\Services\Connection\Fortes.Services.ConnectionIConnectionService.pas=C:\Users\flmir\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>2023/06/07 11:25:09.000.079,C:\Projetos\Fortes\Services\Connection\Fortes.Services.Connection.ConnectionService.pas=C:\Projetos\Fortes\Services\Connection\Fortes.Services.ConnectionIConnectionService.pas</Transaction>
+    <Transaction>2023/06/07 11:39:40.000.819,C:\Projetos\Fortes\View\Fortes.View.Main.dfm=C:\Users\flmir\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2023/06/07 11:39:40.000.819,C:\Projetos\Fortes\View\Fortes.View.Main.pas=C:\Users\flmir\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/06/07 11:39:54.000.187,C:\Projetos\Fortes\Fortes.dproj=C:\Users\flmir\OneDrive\Documentos\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2023/06/07 14:07:31.000.823,=C:\Projetos\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/07 14:08:58.000.670,C:\Projetos\Fortes\Services\Validations\Fortes.Validations.IHandleExceptionServcice.pas=C:\Projetos\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/07 14:11:27.000.620,C:\Projetos\Fortes\Services\Validations\Fortes.Validations.HandleExceptionServcice.pas=C:\Projetos\Fortes\Services\Validations\Fortes.Validations.IHandleExceptionServcice.pas</Transaction>
+    <Transaction>2023/06/07 15:04:56.000.686,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/07 15:27:37.000.599,C:\Fortes\Unit1.pas=C:\Fortes\View\Base\Fortes.View.Base.BaseFind.pas</Transaction>
+    <Transaction>2023/06/07 15:27:37.000.599,C:\Fortes\Unit1.dfm=C:\Fortes\View\Base\Fortes.View.Base.BaseFind.dfm</Transaction>
+    <Transaction>2023/06/07 17:51:50.000.826,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/07 17:53:34.000.668,C:\Fortes\View\Fortes.View.PesquisaCombustivel.dfm=C:\Fortes\Unit1.dfm</Transaction>
+    <Transaction>2023/06/07 17:53:34.000.668,C:\Fortes\View\Fortes.View.PesquisaCombustivel.pas=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/07 22:44:50.000.378,=C:\Fortes\Kernel\Fortes.Kernel.Messages.pas</Transaction>
+    <Transaction>2023/06/08 10:41:50.000.797,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/08 10:44:26.000.289,C:\Fortes\Unit1.pas=C:\Fortes\Services\Kernel\Fortes.Services.Kernel.FindService.pas</Transaction>
+    <Transaction>2023/06/08 10:49:16.000.963,C:\Fortes\Services\Kernel\Fortes.Services.Kernel.FindService.pas=C:\Fortes\Services\Kernel\Fortes.Services.Kernel.IFindService.pas</Transaction>
+    <Transaction>2023/06/08 10:52:53.000.287,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/08 10:53:08.000.075,C:\Fortes\Unit1.pas=C:\Fortes\Services\Kernel\Fortes.Services.Kernel.FindService.pas</Transaction>
+    <Transaction>2023/06/08 11:04:28.000.629,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/08 11:04:57.000.630,C:\Fortes\Unit1.pas=C:\Fortes\Services\Kernel\Fortes.Services.Kernel.IFormService.pas</Transaction>
+    <Transaction>2023/06/08 11:05:12.000.131,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/08 11:05:27.000.981,C:\Fortes\Unit1.pas=C:\Fortes\Services\Kernel\Fortes.Services.Kernel.FormService.pas</Transaction>
+    <Transaction>2023/06/08 14:03:37.000.685,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/08 14:04:19.000.007,C:\Fortes\Unit1.pas=C:\Fortes\View\Base\Fortes.View.Base.BaseCrud.pas</Transaction>
+    <Transaction>2023/06/08 18:23:10.000.624,C:\Fortes\View\Base\Fortes.View.Base.BaseCrud.pas=</Transaction>
+    <Transaction>2023/06/08 18:27:35.000.341,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/08 18:30:40.000.714,C:\Fortes\View\Base\Fortes.View.Base.BaseCrud.pas=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/08 18:30:40.000.714,C:\Fortes\View\Base\Fortes.View.Base.BaseCrud.dfm=C:\Fortes\Unit1.dfm</Transaction>
+    <Transaction>2023/06/08 18:47:27.000.210,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/08 18:49:35.000.591,C:\Fortes\View\Fortes.View.Abastecimento.pas=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/08 18:49:35.000.591,C:\Fortes\View\Fortes.View.Abastecimento.dfm=C:\Fortes\Unit1.dfm</Transaction>
+    <Transaction>2023/06/08 22:10:20.000.118,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/08 22:11:18.000.778,C:\Fortes\Kernel\Fortes.Kernel.Databaseconst.pas=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/09 10:02:20.000.851,=C:\Fortes\Services\Kernel\Fortes.Services.l.Kernel.ICrudService.pas</Transaction>
+    <Transaction>2023/06/09 10:06:52.000.865,C:\Fortes\Services\Kernel\Fortes.Services.l.Kernel.ICrudService.pas=C:\Fortes\Services\Kernel\Fortes.Services.Kernel.ICrudService.pas</Transaction>
+    <Transaction>2023/06/09 13:18:08.000.796,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/09 13:18:47.000.244,C:\Fortes\View\Fortes.View.AbastecimentoItem.pas=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/09 13:18:47.000.244,C:\Fortes\View\Fortes.View.AbastecimentoItem.dfm=C:\Fortes\Unit1.dfm</Transaction>
+    <Transaction>2023/06/09 21:43:23.000.256,=C:\Fortes\Unit1.pas</Transaction>
+    <Transaction>2023/06/09 21:44:23.000.796,C:\Fortes\Unit1.pas=C:\Fortes\Utils\Fortes.Abastecimento.Utils.pas</Transaction>
+  </Transactions>
+</BorlandProject>

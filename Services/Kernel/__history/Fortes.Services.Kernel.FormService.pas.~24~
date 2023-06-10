@@ -1,0 +1,36 @@
+unit Fortes.Services.Kernel.FormService;
+
+interface
+uses
+  Vcl.Controls, Vcl.Forms, Fortes.Services.Kernel.IFormService;
+
+type
+  TFormService<T: TForm> = class(TInterfacedObject, IFormService<T>)
+  private
+    class var FForm: T;
+    function GetForm: T;
+  public
+    destructor Destroy; override;
+    function ShowModal: Boolean;
+  end;
+
+implementation
+
+{ TFormService<T> }
+destructor TFormService<T>.Destroy;
+begin
+  FForm.Free;
+  inherited;
+end;
+
+function TFormService<T>.GetForm: T;
+begin
+  Result := FForm;
+end;
+
+function TFormService<T>.ShowModal: Boolean;
+begin
+  Result := FForm.ShowModal = mrOk;
+end;
+
+end.

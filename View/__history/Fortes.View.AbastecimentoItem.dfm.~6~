@@ -1,0 +1,27 @@
+inherited AbastecimentoItemForm: TAbastecimentoItemForm
+  Caption = 'AbastecimentoItemForm'
+  PixelsPerInch = 96
+  TextHeight = 13
+  object DBEdit1: TDBEdit [1]
+    Left = 16
+    Top = 24
+    Width = 121
+    Height = 21
+    DataField = 'ID_COMBUSTIVEL'
+    DataSource = dsDefault
+    TabOrder = 1
+  end
+  object DBEdit2: TDBEdit [2]
+    Left = 16
+    Top = 51
+    Width = 121
+    Height = 21
+    DataField = 'VALOR'
+    DataSource = dsDefault
+    TabOrder = 2
+  end
+  inherited tbDefault: TFDQuery
+    SQL.Strings = (
+      'SELECT *  FROM ABASTECIMENTO_ITEM')
+  end
+end

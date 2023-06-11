@@ -18,3 +18,13 @@ pressionando o botão de OK.
 - Generics
 - Teste unitário
 - E muitas mais!
+
+# ATENÇÃO
+Caso ocorra o problema de tipos de dados divergentes, seguir os passos:
+
+- Criar uma conexão para o banco a partir do FDConnection;
+- Nos forms AbastecimentoItemForm e FindPesquisarCombustivelForm, nos objetos tbDefault e qryFind, remover os campos pelo fields editor 
+e adicionar de novo a partir da sua conexão;
+- Remover a sua conexão recem criada;
+- O sistema precisará dos campos para realizar alguns BINDS e da propriedade DISPLAYFORMAT (se desejar mascarar) dos campos numéricos para definir as máscaras no DBGRID.
+
